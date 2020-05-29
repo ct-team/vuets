@@ -8,87 +8,89 @@ const src = path.join(__dirname, '../dist/dest');
 const root = path.resolve(__dirname, '../dist');
 //
 const clearEnv = function(result, env) {
-    const s = '<div[^>]*data-hide-env=(' + env + ').*?[^>]*>(.*?)</div>';
-    //console.log(s);
-    const re = new RegExp(s, 'g');
-
-    return result.replace(re, '');
+  const s = '<div[^>]*data-hide-env="?(' + env + ')"?.*?[^>]*>(.*?)</div>';
+  const s2 = '<div[^>]*data-hide-env=.*?[^>]*>(.*?)</div>';
+  const re = new RegExp(s, 'g');
+  const re2 = new RegExp(s2, 'g');
+  const rs1 = result.replace(re, '');
+  return rs1.replace(re2, '$1');
 };
 
 const clearOtherEnv = function(result, env) {
-    const envList = [];
-    let ruleEnv = '';
+  const envList = [];
+  let ruleEnv = '';
 
-    list.forEach(function(item) {
-        if (item.env != env) {
-            envList.push(item.env);
-        }
-    });
+  list.forEach(function(item) {
+    if (item.env != env) {
+      envList.push(item.env);
+    }
+  });
 
-    ruleEnv = envList.join('|');
+  ruleEnv = envList.join('|');
 
-    const s = '<div[^>]*data-env=(' + ruleEnv + ').*?[^>]*>(.*?)</div>';
-    //console.log(s);
-    const re = new RegExp(s, 'g');
-
-    return result.replace(re, '');
+  const s = '<div[^>]*data-env="?(' + ruleEnv + ')"?.*?[^>]*>(.*?)</div>';
+  const s2 = '<div[^>]*data-env=.*?[^>]*>(.*?)</div>';
+  const re = new RegExp(s, 'g');
+  const re2 = new RegExp(s2, 'g');
+  const rs1 = result.replace(re, '');
+  return rs1.replace(re2, '$1');
 };
 //端口替换
 const portReplace = function(obj) {
-    //list.forEach(obj => {
-    const entryHtml = glob.sync(root + '/' + obj.title + '/**/*.html');
-    const publicUrl = obj.url + config.appUrl;
-    const baseUrl = publicUrl + 'assets';
-    const env = obj.env;
+  //list.forEach(obj => {
+  const entryHtml = glob.sync(root + '/' + obj.title + '/**/*.html');
+  const publicUrl = obj.url + config.appUrl;
+  const baseUrl = publicUrl + 'assets';
+  const env = obj.env;
 
-    entryHtml.forEach(f => {
-        fs.readFile(f, 'utf8', function(err, data) {
-            if (err) {
-                throw err;
-            }
+  entryHtml.forEach(f => {
+    fs.readFile(f, 'utf8', function(err, data) {
+      if (err) {
+        throw err;
+      }
 
-            let result = data.replace(
-                /(={1}(\")?(\')?)((\.)?\/assets\/)/gi,
-                '$1' + baseUrl + '/'
-            );
-            result = result.replace(/\.\/assets\//gi, baseUrl + '/');
-            result = result.replace(/<ctEnv>/gi, env);
-            result = result.replace(/<ctVersion>/gi, config.appVersion);
-            result = result.replace(
-                /(={1}(\")?(\')?)((\.)?\/static\/)/gi,
-                '$1' + baseUrl + '/'
-            );
+      let result = data.replace(
+        /(={1}(\")?(\')?)((\.)?\/assets\/)/gi,
+        '$1' + baseUrl + '/'
+      );
+      result = result.replace(/\.\/assets\//gi, baseUrl + '/');
+      result = result.replace(/<ctEnv>/gi, env);
+      result = result.replace(/<ctVersion>/gi, config.appVersion);
+      result = result.replace(
+        /(={1}(\")?(\')?)((\.)?\/static\/)/gi,
+        '$1' + baseUrl + '/'
+      );
 
-            result = result.replace(/<ctAppPublic>/g, publicUrl);
+      result = result.replace(/<ctAppPublic>/g, publicUrl);
 
-            result = clearEnv(result, env);
-            result = clearOtherEnv(result, env);
+      result = clearEnv(result, env);
+      result = clearOtherEnv(result, env);
 
-            fs.writeFile(f, result, 'utf8', function(err) {
-                if (err) {
-                    throw err;
-                }
-            });
-        });
+      fs.writeFile(f, result, 'utf8', function(err) {
+        if (err) {
+          throw err;
+        }
+      });
     });
-    //});
+  });
+  //});
 };
 
 //拷贝项目
 const copy = function() {
-    list.forEach(obj => {
-        const url = path.join(__dirname, '../dist/', obj.title);
+  list.forEach(obj => {
+    const url = path.join(__dirname, '../dist/', obj.title);
 
-        fs.copy(src, url, function(err) {
-            if (err) {
-                throw err;
-            }
-            portReplace(obj);
-            console.log(obj.title + ' copy success!');
-        });
+    fs.copy(src, url, function(err) {
+      if (err) {
+        throw err;
+      }
+      portReplace(obj);
+      console.log(obj.title + ' copy success!');
     });
+  });
 };
 
 module.exports.init = function() {
-    copy();
+  copy();
 };
