@@ -62,7 +62,6 @@ const portReplace = function(obj) {
       );
 
       result = result.replace(/<ctAppPublic>/g, publicUrl);
-
       result = clearEnv(result, env);
       result = clearOtherEnv(result, env);
 

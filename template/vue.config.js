@@ -3,6 +3,8 @@ const buildTool = require('./build-user/tool');
 const buildCopy = require('./build-user/copy');
 const IS_PROD = process.env.NODE_ENV === 'production';
 const autoprefixer = require('autoprefixer');
+const tsImportPluginFactory = require('ts-import-plugin');
+const merge = require('webpack-merge');
 
 module.exports = {
   //lintOnSave: true,
@@ -15,6 +17,10 @@ module.exports = {
     sourceMap: false, // pass custom options to pre-processor loaders. e.g. to pass options to // sass-loader, use { sass: { ... } }
     //requireModuleExtension: false,
     loaderOptions: {
+      sass: {
+        // 向全局sass样式传入共享的全局变量 （新版本sass-loader的参数改变）
+        prependData: `@import "~@/assets/scss/index.scss";`
+      },
       postcss: {
         plugins: [
           autoprefixer({
@@ -49,5 +55,26 @@ module.exports = {
       args[0]['process.env'].BUCheckAppId = `"${buildConfig.checkAppId}"`;
       return args;
     });
+    config.module
+      .rule('ts')
+      .use('ts-loader')
+      .tap(options => {
+        options = merge(options, {
+          transpileOnly: true,
+          getCustomTransformers: () => ({
+            before: [
+              tsImportPluginFactory({
+                libraryName: 'vant',
+                libraryDirectory: 'es',
+                style: true
+              })
+            ]
+          }),
+          compilerOptions: {
+            module: 'es2015'
+          }
+        });
+        return options;
+      });
   }
 };
