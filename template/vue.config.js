@@ -2,7 +2,7 @@ const buildConfig = require('./build-user/config');
 const buildTool = require('./build-user/tool');
 const buildCopy = require('./build-user/copy');
 const IS_PROD = process.env.NODE_ENV === 'production';
-const autoprefixer = require('autoprefixer');
+// const autoprefixer = require('autoprefixer');
 const tsImportPluginFactory = require('ts-import-plugin');
 const merge = require('webpack-merge');
 
@@ -20,15 +20,15 @@ module.exports = {
       sass: {
         // 向全局sass样式传入共享的全局变量 （新版本sass-loader的参数改变）
         prependData: `@import "~@/assets/scss/index.scss";`
-      },
-      postcss: {
-        plugins: [
-          autoprefixer({
-            overrideBrowserslist: ['iOS >= 8', 'Android >= 4.0']
-          }),
-          require('postcss-pxtorem')(buildConfig.px2rem)
-        ]
       }
+      // postcss: {
+      //   plugins: [
+      //     autoprefixer({
+      //       overrideBrowserslist: ['iOS >= 8', 'Android >= 4.0']
+      //     }),
+      //     require('postcss-pxtorem')(buildConfig.px2rem)
+      //   ]
+      // }
     }
   },
   // 所有 webpack-dev-server 的选项都支持。
