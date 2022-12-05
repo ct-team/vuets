@@ -5,7 +5,7 @@ module.exports = {
   list: [
     { title: '1505-stable', url: '//innerstatic.tcy365.com', env: 1505 },
     { title: '1507-test', url: '//teststatic.tcy365.com', env: 1507 },
-    { title: '1506-develop', url: '//devstatic.tcy365.com', env: 1506 },
+    { title: '1506-develop', url: '//static.tcy365.org:1506', env: 1506 },
     { title: '2505-pre', url: '//prestatic.tcy365.com', env: 2505 },
     { title: '80-static', url: '//static.tcy365.com', env: 'production' }
   ],
